@@ -1,0 +1,1506 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Interview & Karakter Crew | PT Seven Ocean Ship Management</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        navy: {
+                            800: '#0f294a',
+                            900: '#091b33',
+                            950: '#051020',
+                        },
+                        teal: {
+                            600: '#0d9488',
+                            700: '#0f766e',
+                        },
+                        gold: {
+                            500: '#d97706',
+                            600: '#b45309',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Range Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #0f294a;
+            border: 3px solid #ffffff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+            cursor: pointer;
+            margin-top: -7px;
+            transition: transform 0.15s ease, background-color 0.15s ease;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+            background: #0d9488;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            cursor: pointer;
+            background: #cbd5e1;
+            border-radius: 999px;
+        }
+        input[type=range]:focus {
+            outline: none;
+        }
+        /* Print Styles for Candidate Summary Card */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printArea, #printArea * {
+                visibility: visible;
+            }
+            #printArea {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                box-shadow: none !important;
+                border: none !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <!-- Toast Notification Banner -->
+    <div id="toastNotification" class="fixed bottom-5 right-5 z-50 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="bg-navy-900 text-white px-5 py-3.5 rounded-xl shadow-xl border border-slate-700 flex items-center space-x-3">
+            <div id="toastIcon" class="w-8 h-8 rounded-full bg-teal-500/20 text-teal-400 flex items-center justify-center">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <div>
+                <p id="toastTitle" class="text-sm font-semibold">Berhasil Disimpan</p>
+                <p id="toastMessage" class="text-xs text-slate-300">Data evaluasi kandidat telah ditambahkan.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Maritime Corporate Navbar -->
+    <header class="bg-navy-950 text-white shadow-lg border-b border-navy-800 sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between py-4 gap-4">
+                <!-- Brand & Logo -->
+                <div class="flex items-center space-x-3.5">
+                    <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-teal-500 to-navy-800 border border-teal-400/30 flex items-center justify-center shadow-inner shrink-0">
+                        <i class="fa-solid fa-anchor text-xl text-white"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs font-bold tracking-wider uppercase text-teal-400">PT Seven Ocean Ship Management</span>
+                            <span class="hidden sm:inline-block px-2 py-0.5 text-[10px] font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-full">CREWING DEPT</span>
+                        </div>
+                        <h1 class="text-lg sm:text-xl font-bold tracking-tight text-white">Dashboard Interview & Karakter Crew</h1>
+                    </div>
+                </div>
+
+                <!-- Header Quick Actions -->
+                <div class="flex items-center space-x-3 self-end md:self-auto">
+                    <div class="hidden lg:flex items-center text-xs text-slate-300 bg-navy-900 px-3 py-2 rounded-lg border border-navy-800">
+                        <i class="fa-regular fa-calendar-check text-teal-400 mr-2"></i>
+                        <span id="currentDateDisplay">Standar ISM Code & STCW 2010</span>
+                    </div>
+                    <button onclick="exportToCSV()" class="px-3.5 py-2 bg-navy-800 hover:bg-slate-800 text-slate-200 text-xs sm:text-sm font-medium rounded-lg border border-slate-700 transition flex items-center space-x-2 shadow-sm">
+                        <i class="fa-solid fa-file-csv text-teal-400"></i>
+                        <span>Ekspor CSV</span>
+                    </button>
+                    <button onclick="scrollToForm()" class="px-3.5 py-2 bg-teal-600 hover:bg-teal-500 text-white text-xs sm:text-sm font-semibold rounded-lg transition flex items-center space-x-2 shadow-md">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Interview Baru</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <!-- Section 1: KPI Summary Cards -->
+        <section aria-label="Ringkasan Statistik Crewing" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- KPI 1 -->
+            <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-200/80 flex items-center justify-between hover:shadow-md transition">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Kandidat Dievaluasi</p>
+                    <div class="flex items-baseline space-x-2 mt-1">
+                        <h2 id="kpiTotal" class="text-2xl sm:text-3xl font-extrabold text-navy-900">0</h2>
+                        <span class="text-xs font-medium text-slate-400">Pelaut</span>
+                    </div>
+                    <p id="kpiBreakdown" class="text-xs text-slate-500 mt-1">0 Officer • 0 Rating</p>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-blue-50 text-navy-800 flex items-center justify-center text-xl border border-blue-100">
+                    <i class="fa-solid fa-users-viewfinder"></i>
+                </div>
+            </div>
+
+            <!-- KPI 2 -->
+            <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-200/80 flex items-center justify-between hover:shadow-md transition">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Rata-Rata Skor Karakter</p>
+                    <div class="flex items-baseline space-x-2 mt-1">
+                        <h2 id="kpiAvgScore" class="text-2xl sm:text-3xl font-extrabold text-teal-700">0.0</h2>
+                        <span class="text-xs font-medium text-slate-400">/ 5.00</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-1">Benchmark PT SOSM: <span class="font-semibold text-navy-800">3.80</span></p>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center text-xl border border-teal-100">
+                    <i class="fa-solid fa-award"></i>
+                </div>
+            </div>
+
+            <!-- KPI 3 -->
+            <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-200/80 flex items-center justify-between hover:shadow-md transition">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Siap Join (Recommended)</p>
+                    <div class="flex items-baseline space-x-2 mt-1">
+                        <h2 id="kpiRecommended" class="text-2xl sm:text-3xl font-extrabold text-emerald-600">0</h2>
+                        <span id="kpiRecPct" class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">0%</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-1">Lolos psikologis & safety</p>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl border border-emerald-100">
+                    <i class="fa-solid fa-ship"></i>
+                </div>
+            </div>
+
+            <!-- KPI 4 -->
+            <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-200/80 flex items-center justify-between hover:shadow-md transition">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Perlu Evaluasi (Hold/Review)</p>
+                    <div class="flex items-baseline space-x-2 mt-1">
+                        <h2 id="kpiReview" class="text-2xl sm:text-3xl font-extrabold text-amber-600">0</h2>
+                        <span id="kpiRejectedInfo" class="text-xs font-medium text-rose-500">0 Not Rec</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-1">Butuh observasi / briefing ulang</p>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl border border-amber-100">
+                    <i class="fa-solid fa-clipboard-question"></i>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Interactive Evaluation Form (Left) & Visual Analytics (Right) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            <!-- Left Column (7 cols): Interactive Candidate Evaluation Form -->
+            <section id="evaluationFormSection" class="lg:col-span-7 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-gradient-to-r from-navy-900 to-navy-800 px-6 py-4 flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 rounded-lg bg-teal-500/20 border border-teal-400/30 flex items-center justify-center text-teal-300">
+                            <i class="fa-solid fa-user-pen"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-base sm:text-lg font-bold text-white">Input & Penilaian Interview Baru</h2>
+                            <p class="text-xs text-slate-300">Evaluasi 5 dimensi karakter pelaut secara objektif saat wawancara</p>
+                        </div>
+                    </div>
+                    <button type="button" onclick="resetForm()" class="text-xs text-slate-300 hover:text-white underline">
+                        Reset Form
+                    </button>
+                </div>
+
+                <form id="interviewForm" class="p-6 space-y-5">
+                    <!-- Candidate Biodata Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap Kandidat <span class="text-rose-500">*</span></label>
+                            <input type="text" id="candName" required placeholder="Contoh: Capt. Budi Santoso" 
+                                class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:bg-white transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Posisi / Rank <span class="text-rose-500">*</span></label>
+                            <select id="candRank" required onchange="updateLivePreview()"
+                                class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:bg-white transition">
+                                <optgroup label="Deck Officer">
+                                    <option value="Master">Master (Captain)</option>
+                                    <option value="Chief Officer" selected>Chief Officer (C/O)</option>
+                                    <option value="2nd Officer">2nd Officer (2/O)</option>
+                                    <option value="3rd Officer">3rd Officer (3/O)</option>
+                                </optgroup>
+                                <optgroup label="Engine Officer">
+                                    <option value="Chief Engineer">Chief Engineer (C/E)</option>
+                                    <option value="2nd Engineer">2nd Engineer (2/E)</option>
+                                    <option value="3rd Engineer">3rd Engineer (3/E)</option>
+                                    <option value="ETO">Electro-Technical Officer (ETO)</option>
+                                </optgroup>
+                                <optgroup label="Deck Rating">
+                                    <option value="Bosun">Bosun</option>
+                                    <option value="AB (Able Seaman)">AB (Able Seaman)</option>
+                                    <option value="OS (Ordinary Seaman)">OS (Ordinary Seaman)</option>
+                                </optgroup>
+                                <optgroup label="Engine & Galley Rating">
+                                    <option value="Fitter">Fitter / Welder</option>
+                                    <option value="Oiler">Oiler / Motorman</option>
+                                    <option value="Wiper">Wiper</option>
+                                    <option value="Chief Cook">Chief Cook</option>
+                                    <option value="Messman">Messman</option>
+                                </optgroup>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Tipe Kapal Tujuan <span class="text-rose-500">*</span></label>
+                            <select id="candVessel" required
+                                class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:bg-white transition">
+                                <option value="Oil/Chemical Tanker">Oil / Chemical Tanker</option>
+                                <option value="Bulk Carrier">Bulk Carrier</option>
+                                <option value="Cargo">General Cargo / Container</option>
+                                <option value="SPB">SPB (Self Propelled Barge)</option>
+                                <option value="Tug & Barge">Tug & Barge</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">No. Seaman Book / Sertifikat STCW <span class="text-rose-500">*</span></label>
+                            <input type="text" id="candDoc" required placeholder="Contoh: SB-62019482 / COC II/2" 
+                                class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:bg-white transition">
+                        </div>
+
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Pewawancara (Crewing Officer / Marine Supt.) <span class="text-rose-500">*</span></label>
+                            <input type="text" id="candInterviewer" required value="Capt. Hendra Wijaya (Crewing Manager)" 
+                                class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:bg-white transition">
+                        </div>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="border-t border-slate-200 pt-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                            <div>
+                                <h3 class="text-sm font-bold text-navy-900 flex items-center">
+                                    <i class="fa-solid fa-sliders text-teal-600 mr-2"></i>
+                                    Penilaian 5 Dimensi Karakter Maritim (Skala 1 - 5)
+                                </h3>
+                                <p class="text-xs text-slate-500">Geser slider atau klik tombol panduan pertanyaan interview di tiap dimensi</p>
+                            </div>
+                            <div class="flex items-center space-x-2 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 self-start">
+                                <span class="text-xs text-slate-500">Skor Simulasi:</span>
+                                <span id="liveAvgBadge" class="text-sm font-extrabold text-navy-900">4.00</span>
+                                <span id="liveStatusPill" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">Recommended</span>
+                            </div>
+                        </div>
+
+                        <!-- 5 Dimensions Sliders -->
+                        <div class="space-y-4">
+                            <!-- Dimension 1: Safety Mindset -->
+                            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/90 hover:border-teal-300 transition">
+                                <div class="flex items-center justify-between mb-1">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="w-6 h-6 rounded-md bg-navy-900 text-white text-xs font-bold flex items-center justify-center">1</span>
+                                        <label for="scoreSafety" class="text-sm font-bold text-slate-800">Safety Mindset & Kepatuhan SOP</label>
+                                        <button type="button" onclick="togglePrompt('prompt1')" class="text-xs text-teal-700 hover:text-teal-900 bg-teal-50 px-2 py-0.5 rounded border border-teal-200 font-medium">
+                                            <i class="fa-regular fa-lightbulb mr-1"></i>Panduan Tanya
+                                        </button>
+                                    </div>
+                                    <span id="valSafety" class="text-sm font-extrabold text-navy-900 bg-white px-2.5 py-0.5 rounded border border-slate-300">4 / 5</span>
+                                </div>
+                                <p class="text-xs text-slate-500 mb-2">Kepatuhan terhadap aturan keselamatan, penggunaan APD, Permit to Work & ISM Code.</p>
+                                <div id="prompt1" class="hidden mb-2.5 p-2.5 bg-amber-50/80 border-l-4 border-amber-500 rounded text-xs text-slate-700">
+                                    <strong>Pertanyaan Behavioral:</strong> "Ceritakan pengalaman saat Anda melihat rekan kerja atau atasan mengambil jalan pintas yang melanggar prosedur keselamatan (misal masuk Enclosed Space tanpa izin). Apa tindakan Anda?"
+                                </div>
+                                <input type="range" id="scoreSafety" min="1" max="5" step="0.5" value="4" oninput="handleSliderChange()">
+                                <div class="flex justify-between text-[10px] font-medium text-slate-400 mt-1">
+                                    <span>1 - Abai SOP</span>
+                                    <span>2 - Kurang</span>
+                                    <span>3 - Standar</span>
+                                    <span>4 - Patuh & Proaktif</span>
+                                    <span>5 - Safety Leader</span>
+                                </div>
+                            </div>
+
+                            <!-- Dimension 2: Stress Resilience -->
+                            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/90 hover:border-teal-300 transition">
+                                <div class="flex items-center justify-between mb-1">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="w-6 h-6 rounded-md bg-navy-900 text-white text-xs font-bold flex items-center justify-center">2</span>
+                                        <label for="scoreStress" class="text-sm font-bold text-slate-800">Ketahanan Stres & Emosi</label>
+                                        <button type="button" onclick="togglePrompt('prompt2')" class="text-xs text-teal-700 hover:text-teal-900 bg-teal-50 px-2 py-0.5 rounded border border-teal-200 font-medium">
+                                            <i class="fa-regular fa-lightbulb mr-1"></i>Panduan Tanya
+                                        </button>
+                                    </div>
+                                    <span id="valStress" class="text-sm font-extrabold text-navy-900 bg-white px-2.5 py-0.5 rounded border border-slate-300">4 / 5</span>
+                                </div>
+                                <p class="text-xs text-slate-500 mb-2">Ketenangan menghadapi cuaca buruk, inspeksi vetting/PSC, homesick, & situasi darurat di laut.</p>
+                                <div id="prompt2" class="hidden mb-2.5 p-2.5 bg-amber-50/80 border-l-4 border-amber-500 rounded text-xs text-slate-700">
+                                    <strong>Pertanyaan Behavioral:</strong> "Bagaimana cara Anda menjaga fokus dan mengendalikan emosi saat menghadapi jadwal sandar/bongkar muat yang padat, kurang tidur, atau teguran keras di atas kapal?"
+                                </div>
+                                <input type="range" id="scoreStress" min="1" max="5" step="0.5" value="4" oninput="handleSliderChange()">
+                                <div class="flex justify-between text-[10px] font-medium text-slate-400 mt-1">
+                                    <span>1 - Mudah Panik/Emosi</span>
+                                    <span>2 - Labil</span>
+                                    <span>3 - Cukup Tenang</span>
+                                    <span>4 - Tangguh</span>
+                                    <span>5 - Sangat Stabil</span>
+                                </div>
+                            </div>
+
+                            <!-- Dimension 3: Teamwork & Communication -->
+                            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/90 hover:border-teal-300 transition">
+                                <div class="flex items-center justify-between mb-1">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="w-6 h-6 rounded-md bg-navy-900 text-white text-xs font-bold flex items-center justify-center">3</span>
+                                        <label for="scoreTeamwork" class="text-sm font-bold text-slate-800">Kerja Sama Tim & Komunikasi</label>
+                                        <button type="button" onclick="togglePrompt('prompt3')" class="text-xs text-teal-700 hover:text-teal-900 bg-teal-50 px-2 py-0.5 rounded border border-teal-200 font-medium">
+                                            <i class="fa-regular fa-lightbulb mr-1"></i>Panduan Tanya
+                                        </button>
+                                    </div>
+                                    <span id="valTeamwork" class="text-sm font-extrabold text-navy-900 bg-white px-2.5 py-0.5 rounded border border-slate-300">4 / 5</span>
+                                </div>
+                                <p class="text-xs text-slate-500 mb-2">Adaptasi multikultural, closed-loop communication, & sinergi antar-departemen Deck/Engine/Galley.</p>
+                                <div id="prompt3" class="hidden mb-2.5 p-2.5 bg-amber-50/80 border-l-4 border-amber-500 rounded text-xs text-slate-700">
+                                    <strong>Pertanyaan Behavioral:</strong> "Pernahkah terjadi miskomunikasi atau konflik pribadi dengan kru berbeda budaya/departemen selama kontrak berlayar? Bagaimana Anda menyelesaikannya?"
+                                </div>
+                                <input type="range" id="scoreTeamwork" min="1" max="5" step="0.5" value="4" oninput="handleSliderChange()">
+                                <div class="flex justify-between text-[10px] font-medium text-slate-400 mt-1">
+                                    <span>1 - Individualis/Konflik</span>
+                                    <span>2 - Pasif</span>
+                                    <span>3 - Kooperatif</span>
+                                    <span>4 - Komunikatif</span>
+                                    <span>5 - Sinergi Tinggi</span>
+                                </div>
+                            </div>
+
+                            <!-- Dimension 4: Integrity & Discipline -->
+                            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/90 hover:border-teal-300 transition">
+                                <div class="flex items-center justify-between mb-1">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="w-6 h-6 rounded-md bg-navy-900 text-white text-xs font-bold flex items-center justify-center">4</span>
+                                        <label for="scoreIntegrity" class="text-sm font-bold text-slate-800">Integritas & Disiplin</label>
+                                        <button type="button" onclick="togglePrompt('prompt4')" class="text-xs text-teal-700 hover:text-teal-900 bg-teal-50 px-2 py-0.5 rounded border border-teal-200 font-medium">
+                                            <i class="fa-regular fa-lightbulb mr-1"></i>Panduan Tanya
+                                        </button>
+                                    </div>
+                                    <span id="valIntegrity" class="text-sm font-extrabold text-navy-900 bg-white px-2.5 py-0.5 rounded border border-slate-300">4.5 / 5</span>
+                                </div>
+                                <p class="text-xs text-slate-500 mb-2">Kejujuran pencatatan logbook, tanggung jawab jam jaga (watchkeeping), & kepatuhan Zero Alcohol/Drug.</p>
+                                <div id="prompt4" class="hidden mb-2.5 p-2.5 bg-amber-50/80 border-l-4 border-amber-500 rounded text-xs text-slate-700">
+                                    <strong>Pertanyaan Behavioral:</strong> "Jika Anda tidak sengaja melakukan kesalahan operasional atau kerusakan alat saat bertugas jaga malam tanpa ada yang melihat, apa langkah yang Anda ambil?"
+                                </div>
+                                <input type="range" id="scoreIntegrity" min="1" max="5" step="0.5" value="4.5" oninput="handleSliderChange()">
+                                <div class="flex justify-between text-[10px] font-medium text-slate-400 mt-1">
+                                    <span>1 - Tidak Jujur</span>
+                                    <span>2 - Kurang Disiplin</span>
+                                    <span>3 - Cukup Baik</span>
+                                    <span>4 - Jujur & Disiplin</span>
+                                    <span>5 - Integritas Penuh</span>
+                                </div>
+                            </div>
+
+                            <!-- Dimension 5: Leadership & Initiative -->
+                            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/90 hover:border-teal-300 transition">
+                                <div class="flex items-center justify-between mb-1">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="w-6 h-6 rounded-md bg-navy-900 text-white text-xs font-bold flex items-center justify-center">5</span>
+                                        <label for="scoreLeadership" class="text-sm font-bold text-slate-800">Kepemimpinan & Inisiatif</label>
+                                        <button type="button" onclick="togglePrompt('prompt5')" class="text-xs text-teal-700 hover:text-teal-900 bg-teal-50 px-2 py-0.5 rounded border border-teal-200 font-medium">
+                                            <i class="fa-regular fa-lightbulb mr-1"></i>Panduan Tanya
+                                        </button>
+                                    </div>
+                                    <span id="valLeadership" class="text-sm font-extrabold text-navy-900 bg-white px-2.5 py-0.5 rounded border border-slate-300">3.5 / 5</span>
+                                </div>
+                                <p class="text-xs text-slate-500 mb-2">Pengambilan keputusan tepat, pembinaan junior/rating, serta inisiatif perawatan kapal (PMS).</p>
+                                <div id="prompt5" class="hidden mb-2.5 p-2.5 bg-amber-50/80 border-l-4 border-amber-500 rounded text-xs text-slate-700">
+                                    <strong>Pertanyaan Behavioral:</strong> "Berikan contoh inisiatif perbaikan atau pencegahan masalah teknis/operasional yang pernah Anda lakukan di kapal sebelumnya di luar rutinitas harian Anda."
+                                </div>
+                                <input type="range" id="scoreLeadership" min="1" max="5" step="0.5" value="3.5" oninput="handleSliderChange()">
+                                <div class="flex justify-between text-[10px] font-medium text-slate-400 mt-1">
+                                    <span>1 - Menunggu Perintah</span>
+                                    <span>2 - Kurang Inisiatif</span>
+                                    <span>3 - Standar Rank</span>
+                                    <span>4 - Inisiatif Tinggi</span>
+                                    <span>5 - Pemimpin Teladan</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notes & Manual Override Option -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Catatan Pewawancara (Observasi Sikap & Red Flags)</label>
+                            <textarea id="candNotes" rows="3" placeholder="Tuliskan kelebihan menonjol, pengalaman kapal sejenis, bahasa Inggris maritim, atau catatan khusus (red flags)..." 
+                                class="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:bg-white transition"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Keputusan Rekomendasi</label>
+                            <select id="candDecision" class="w-full px-3 py-2 text-sm font-semibold bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500">
+                                <option value="AUTO">Otomatis (Berdasarkan Skor)</option>
+                                <option value="Recommended">Recommended (Siap Join)</option>
+                                <option value="Conditional">Conditional / Backup (Review)</option>
+                                <option value="Not Recommended">Not Recommended (Tolak)</option>
+                            </select>
+                            <p class="text-[11px] text-slate-500 mt-1.5 leading-relaxed">
+                                *Otomatis: &ge;3.8 Recommended, 3.0–3.79 Review, &lt;3.0 Not Rec. (Safety &lt;3 otomatis Review/Tolak).
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="pt-2 flex flex-col sm:flex-row items-center justify-end gap-3 border-t border-slate-100">
+                        <button type="button" onclick="previewLiveOnRadar()" class="w-full sm:w-auto px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-navy-900 text-sm font-semibold rounded-xl transition flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-chart-radar text-teal-600"></i>
+                            <span>Simulasikan di Grafik</span>
+                        </button>
+                        <button type="submit" class="w-full sm:w-auto px-6 py-2.5 bg-navy-900 hover:bg-navy-800 text-white text-sm font-bold rounded-xl shadow-md hover:shadow-lg transition flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-floppy-disk text-teal-400"></i>
+                            <span>Simpan Hasil Penilaian</span>
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Right Column (5 cols): Visual Analytics & Character Profile -->
+            <section class="lg:col-span-5 space-y-6">
+                
+                <!-- Radar Chart Card: 5 Character Dimensions vs PT SOSM Benchmark -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+                    <div class="flex items-start justify-between gap-2 mb-3">
+                        <div>
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-teal-600">Profil Karakter Kandidat</span>
+                            <h3 id="radarCandidateName" class="text-base font-bold text-navy-900">Capt. Rendra Pratama</h3>
+                            <p id="radarCandidateMeta" class="text-xs text-slate-500">Chief Officer • Oil/Chemical Tanker</p>
+                        </div>
+                        <span id="radarBadge" class="px-2.5 py-1 text-xs font-bold rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 shrink-0">
+                            Recommended
+                        </span>
+                    </div>
+
+                    <!-- Radar Canvas Container -->
+                    <div class="relative w-full h-64 sm:h-72 my-2">
+                        <canvas id="characterRadarChart"></canvas>
+                    </div>
+
+                    <!-- Selected Candidate Quick Insights -->
+                    <div class="mt-3 pt-3 border-t border-slate-100 bg-slate-50 rounded-xl p-3">
+                        <div class="flex items-center justify-between text-xs mb-1.5">
+                            <span class="font-semibold text-slate-600">Skor Rata-Rata Karakter:</span>
+                            <span id="radarAvgText" class="font-extrabold text-navy-900 text-sm">4.50 / 5.00</span>
+                        </div>
+                        <p id="radarNotePreview" class="text-xs text-slate-600 italic line-clamp-2">
+                            "Pengalaman 4 tahun di Chemical Tanker, pemahaman SIRE 2.0 & Enclosed Space sangat kuat."
+                        </p>
+                        <div class="mt-2.5 flex justify-end">
+                            <button id="openSelectedModalBtn" onclick="openCurrentSelectedModal()" class="text-xs font-semibold text-teal-700 hover:text-teal-900 flex items-center space-x-1">
+                                <span>Lihat Kartu Laporan Lengkap & Cetak</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Distribution Chart Card: Hiring Recommendation Breakdown -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+                        <div>
+                            <h3 class="text-sm font-bold text-navy-900">Distribusi Rekomendasi Kandidat</h3>
+                            <p class="text-xs text-slate-500">Proporsi kelulusan interview berdasarkan kategori</p>
+                        </div>
+                        <!-- Filter for Chart -->
+                        <div class="flex items-center space-x-1.5">
+                            <select id="chartRankFilter" onchange="updateDistributionChart()" class="text-xs bg-slate-50 border border-slate-300 rounded-lg px-2 py-1 text-slate-700 font-medium focus:outline-none focus:border-teal-500">
+                                <option value="ALL">Semua Rank</option>
+                                <option value="Officer">Officer</option>
+                                <option value="Rating">Rating</option>
+                            </select>
+                            <select id="chartVesselFilter" onchange="updateDistributionChart()" class="text-xs bg-slate-50 border border-slate-300 rounded-lg px-2 py-1 text-slate-700 font-medium focus:outline-none focus:border-teal-500">
+                                <option value="ALL">Semua Kapal</option>
+                                <option value="Oil/Chemical Tanker">Tanker</option>
+                                <option value="Bulk Carrier">Bulk Carrier</option>
+                                <option value="Cargo">Cargo</option>
+                                <option value="SPB">SPB</option>
+                                <option value="Tug & Barge">Tug & Barge</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 items-center gap-4">
+                        <div class="relative h-44 w-full flex items-center justify-center">
+                            <canvas id="distributionDoughnutChart"></canvas>
+                        </div>
+                        <div class="space-y-2.5 text-xs">
+                            <div class="flex items-center justify-between p-2 rounded-lg bg-emerald-50/70 border border-emerald-100">
+                                <div class="flex items-center space-x-2">
+                                    <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                                    <span class="font-semibold text-slate-700">Recommended</span>
+                                </div>
+                                <span id="distCountRec" class="font-bold text-emerald-700">0</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2 rounded-lg bg-amber-50/70 border border-amber-100">
+                                <div class="flex items-center space-x-2">
+                                    <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+                                    <span class="font-semibold text-slate-700">Conditional / Review</span>
+                                </div>
+                                <span id="distCountCond" class="font-bold text-amber-700">0</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2 rounded-lg bg-rose-50/70 border border-rose-100">
+                                <div class="flex items-center space-x-2">
+                                    <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+                                    <span class="font-semibold text-slate-700">Not Recommended</span>
+                                </div>
+                                <span id="distCountNot" class="font-bold text-rose-700">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+
+        <!-- Section 3: Candidate Interview History Table -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="p-5 sm:p-6 border-b border-slate-200 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-base sm:text-lg font-bold text-navy-900 flex items-center">
+                        <i class="fa-solid fa-list-check text-teal-600 mr-2.5"></i>
+                        Daftar & Riwayat Hasil Interview Crew
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-0.5">Klik baris kandidat untuk membandingkan profil karakter di grafik radar atau membuka laporan detail</p>
+                </div>
+
+                <!-- Search & Filters -->
+                <div class="flex flex-wrap items-center gap-2.5">
+                    <div class="relative flex-grow sm:flex-grow-0">
+                        <i class="fa-solid fa-magnifying-glass text-slate-400 text-xs absolute left-3 top-1/2 -translate-y-1/2"></i>
+                        <input type="text" id="searchInput" onkeyup="renderTable()" placeholder="Cari nama, rank, no. buku pelaut..." 
+                            class="w-full sm:w-60 pl-8 pr-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+                    </div>
+
+                    <select id="filterDept" onchange="renderTable()" class="px-3 py-2 text-xs font-medium bg-slate-50 border border-slate-300 rounded-lg text-slate-700 focus:ring-2 focus:ring-teal-500">
+                        <option value="ALL">Semua Departemen</option>
+                        <option value="Deck">Deck Dept</option>
+                        <option value="Engine">Engine Dept</option>
+                        <option value="Galley">Galley / Catering</option>
+                    </select>
+
+                    <select id="filterStatus" onchange="renderTable()" class="px-3 py-2 text-xs font-medium bg-slate-50 border border-slate-300 rounded-lg text-slate-700 focus:ring-2 focus:ring-teal-500">
+                        <option value="ALL">Semua Status</option>
+                        <option value="Recommended">Recommended</option>
+                        <option value="Conditional">Conditional / Review</option>
+                        <option value="Not Recommended">Not Recommended</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Responsive Table -->
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                            <th class="py-3.5 px-4">Kandidat & Dokumen</th>
+                            <th class="py-3.5 px-4">Rank / Dept</th>
+                            <th class="py-3.5 px-4">Tipe Kapal</th>
+                            <th class="py-3.5 px-4 text-center">Rincian Dimensi (S/E/T/I/L)</th>
+                            <th class="py-3.5 px-4 text-center">Skor Total</th>
+                            <th class="py-3.5 px-4">Rekomendasi</th>
+                            <th class="py-3.5 px-4 text-right">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="candidateTableBody" class="divide-y divide-slate-100 text-sm">
+                        <!-- Rows populated dynamically via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Empty Search State -->
+            <div id="emptyTableState" class="hidden py-12 text-center">
+                <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3 text-lg">
+                    <i class="fa-solid fa-folder-open"></i>
+                </div>
+                <p class="text-sm font-semibold text-slate-700">Tidak ada data kandidat yang sesuai filter</p>
+                <p class="text-xs text-slate-500 mt-1">Coba ubah kata kunci pencarian atau reset filter departemen/status.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-10 py-5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
+            <p class="font-medium text-slate-600">&copy; 2026 PT Seven Ocean Ship Management (PT SOSM) — Crewing & Marine HR Division.</p>
+            <p>Sistem Evaluasi Karakter & Kesiapan Psikologis Pelaut • MLC 2006 & ISM Code Compliant</p>
+        </div>
+    </footer>
+
+    <!-- Candidate Detail & Printable Summary Card Modal -->
+    <div id="candidateModal" class="fixed inset-0 z-50 hidden bg-navy-950/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+        <div id="printArea" class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border border-slate-200 overflow-hidden my-auto animate-fadeIn">
+            <!-- Modal Header -->
+            <div class="bg-navy-900 text-white px-6 py-4 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-anchor text-teal-400 text-lg"></i>
+                    <div>
+                        <p class="text-[10px] uppercase tracking-widest text-teal-300 font-bold">PT Seven Ocean Ship Management</p>
+                        <h3 class="text-base font-bold">Laporan Hasil Interview & Profil Karakter Crew</h3>
+                    </div>
+                </div>
+                <button onclick="closeModal()" class="no-print w-8 h-8 rounded-lg bg-navy-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-6 space-y-5">
+                <!-- Candidate Top Summary -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <h4 id="modalName" class="text-xl font-extrabold text-navy-900">-</h4>
+                            <span id="modalCategoryTag" class="px-2 py-0.5 text-[11px] font-bold rounded bg-slate-100 text-slate-700">Officer</span>
+                        </div>
+                        <p id="modalRankVessel" class="text-sm font-medium text-teal-700 mt-0.5">-</p>
+                        <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 mt-2">
+                            <span><i class="fa-solid fa-passport mr-1 text-slate-400"></i>Dokumen: <strong id="modalDoc" class="text-slate-700">-</strong></span>
+                            <span><i class="fa-regular fa-calendar mr-1 text-slate-400"></i>Tanggal: <strong id="modalDate" class="text-slate-700">-</strong></span>
+                        </div>
+                    </div>
+                    <div class="text-left sm:text-right bg-slate-50 p-3 rounded-xl border border-slate-200">
+                        <span class="text-[11px] font-semibold uppercase text-slate-400 block">Skor Karakter Total</span>
+                        <span id="modalScore" class="text-2xl font-extrabold text-navy-900">0.00</span>
+                        <span class="text-xs text-slate-400">/ 5.00</span>
+                        <div class="mt-1">
+                            <span id="modalBadge" class="inline-block px-2.5 py-0.5 text-xs font-bold rounded-full">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5 Dimension Progress Bars -->
+                <div>
+                    <h5 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Rincian Evaluasi 5 Dimensi Karakter</h5>
+                    <div id="modalDimensionsList" class="space-y-3">
+                        <!-- Filled via JS -->
+                    </div>
+                </div>
+
+                <!-- Strengths & Red Flags / Notes -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="p-3.5 rounded-xl bg-emerald-50/60 border border-emerald-200/80">
+                        <h6 class="text-xs font-bold text-emerald-800 flex items-center mb-1">
+                            <i class="fa-solid fa-circle-check mr-1.5"></i>Kekuatan Utama (Strengths)
+                        </h6>
+                        <p id="modalStrengths" class="text-xs text-slate-700 leading-relaxed">-</p>
+                    </div>
+                    <div class="p-3.5 rounded-xl bg-amber-50/60 border border-amber-200/80">
+                        <h6 class="text-xs font-bold text-amber-800 flex items-center mb-1">
+                            <i class="fa-solid fa-triangle-exclamation mr-1.5"></i>Area Perhatian / Red Flags
+                        </h6>
+                        <p id="modalRedFlags" class="text-xs text-slate-700 leading-relaxed">-</p>
+                    </div>
+                </div>
+
+                <!-- Interviewer Notes -->
+                <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+                    <h6 class="text-xs font-bold text-navy-900 mb-1">Catatan & Kesimpulan Pewawancara:</h6>
+                    <p id="modalNotes" class="text-xs text-slate-700 leading-relaxed">-</p>
+                    <p class="text-[11px] text-slate-500 mt-2 pt-2 border-t border-slate-200">
+                        Pewawancara: <strong id="modalInterviewer" class="text-slate-700">-</strong>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Modal Footer Actions -->
+            <div class="no-print bg-slate-50 px-6 py-3.5 border-t border-slate-200 flex items-center justify-between">
+                <button onclick="deleteCandidateFromModal()" class="text-xs font-semibold text-rose-600 hover:text-rose-800 flex items-center space-x-1">
+                    <i class="fa-solid fa-trash-can"></i>
+                    <span>Hapus Data</span>
+                </button>
+                <div class="flex items-center space-x-2.5">
+                    <button onclick="window.print()" class="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold rounded-lg shadow-sm flex items-center space-x-1.5 transition">
+                        <i class="fa-solid fa-print"></i>
+                        <span>Cetak / Simpan PDF</span>
+                    </button>
+                    <button onclick="closeModal()" class="px-4 py-2 bg-navy-900 hover:bg-navy-800 text-white text-xs font-semibold rounded-lg transition">
+                        Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // ==========================================
+        // 1. INITIAL DATA & CONFIGURATION
+        // ==========================================
+        const BENCHMARK_SCORES = [4.0, 3.8, 3.8, 4.2, 3.6]; // Standar Minimum PT SOSM
+
+        // Helper mapping Rank to Category (Officer/Rating) & Department (Deck/Engine/Galley)
+        function getRankMetadata(rank) {
+            const officers = ['Master', 'Chief Officer', '2nd Officer', '3rd Officer', 'Chief Engineer', '2nd Engineer', '3rd Engineer', 'ETO'];
+            const engineRanks = ['Chief Engineer', '2nd Engineer', '3rd Engineer', 'ETO', 'Fitter', 'Oiler', 'Wiper'];
+            const galleyRanks = ['Chief Cook', 'Messman'];
+
+            const category = officers.includes(rank) ? 'Officer' : 'Rating';
+            let department = 'Deck';
+            if (engineRanks.includes(rank)) department = 'Engine';
+            else if (galleyRanks.includes(rank)) department = 'Galley';
+
+            return { category, department };
+        }
+
+        // Pre-populated 6 realistic Indonesian Seafarer Sample Records
+        let candidates = [
+            {
+                id: 'SOSM-2026-001',
+                name: 'Capt. Rendra Pratama',
+                rank: 'Chief Officer',
+                category: 'Officer',
+                department: 'Deck',
+                vesselType: 'Oil/Chemical Tanker',
+                docNumber: 'SB-61049281 / COC II/2',
+                interviewer: 'Capt. Hendra Wijaya (Crewing Manager)',
+                date: '2026-11-20',
+                scores: { safety: 4.5, stress: 4.5, teamwork: 4.0, integrity: 5.0, leadership: 4.5 },
+                avgScore: 4.50,
+                status: 'Recommended',
+                notes: 'Pengalaman 4 kontrak di Chemical Tanker (IMO Type II). Pemahaman SIRE 2.0, cargo calculation, dan prosedur Enclosed Space Entry sangat kuat. Komunikasi bahasa Inggris maritim lancar dan tenang.'
+            },
+            {
+                id: 'SOSM-2026-002',
+                name: 'Irwan Setiawan, S.Tr.Pel',
+                rank: '2nd Engineer',
+                category: 'Officer',
+                department: 'Engine',
+                vesselType: 'Bulk Carrier',
+                docNumber: 'SB-62938471 / COC III/2',
+                interviewer: 'Chief Eng. Bambang Sutrisno',
+                date: '2026-11-21',
+                scores: { safety: 4.0, stress: 4.0, teamwork: 4.5, integrity: 4.5, leadership: 4.0 },
+                avgScore: 4.20,
+                status: 'Recommended',
+                notes: 'Menguasai troubleshooting Main Engine MAN B&W dan sistem PMS berbasis digital. Sangat kooperatif saat ditanya tentang koordinasi dengan pihak Deck ketika bunkering.'
+            },
+            {
+                id: 'SOSM-2026-003',
+                name: 'Dedi Kurniawan',
+                rank: 'Bosun',
+                category: 'Rating',
+                department: 'Deck',
+                vesselType: 'Bulk Carrier',
+                docNumber: 'SB-59382014 / COP II/5',
+                interviewer: 'Capt. Hendra Wijaya (Crewing Manager)',
+                date: '2026-11-21',
+                scores: { safety: 4.0, stress: 3.5, teamwork: 4.0, integrity: 4.0, leadership: 4.0 },
+                avgScore: 3.90,
+                status: 'Recommended',
+                notes: 'Tegas memimpin tim AB/OS untuk perawatan palka (hatch cover) dan mooring operation. Riwayat berlayar konsisten tanpa catatan indisipliner.'
+            },
+            {
+                id: 'SOSM-2026-004',
+                name: 'Ahmad Fauzi',
+                rank: 'AB (Able Seaman)',
+                category: 'Rating',
+                department: 'Deck',
+                vesselType: 'Tug & Barge',
+                docNumber: 'SB-63829105 / COP II/4',
+                interviewer: 'Rina Kusuma (Sr. Crewing Officer)',
+                date: '2026-11-22',
+                scores: { safety: 3.0, stress: 3.0, teamwork: 3.5, integrity: 4.0, leadership: 3.0 },
+                avgScore: 3.30,
+                status: 'Conditional',
+                notes: 'Pengalaman towing batu bara di Kalimantan cukup baik, namun pemahaman terkait Risk Assessment dan penggunaan PPE khusus masih perlu diperkuat melalui pre-joining safety briefing.'
+            },
+            {
+                id: 'SOSM-2026-005',
+                name: 'Rizky Ramadhan',
+                rank: 'Oiler',
+                category: 'Rating',
+                department: 'Engine',
+                vesselType: 'Oil/Chemical Tanker',
+                docNumber: 'SB-64019283 / COP III/4',
+                interviewer: 'Chief Eng. Bambang Sutrisno',
+                date: '2026-11-23',
+                scores: { safety: 2.5, stress: 2.5, teamwork: 3.0, integrity: 3.0, leadership: 2.5 },
+                avgScore: 2.70,
+                status: 'Not Recommended',
+                notes: 'Red Flag: Pernah sign-off lebih awal pada kontrak sebelumnya karena konflik interpersonal di kamar mesin. Kurang memahami prosedur Lock Out Tag Out (LOTO).'
+            },
+            {
+                id: 'SOSM-2026-006',
+                name: 'Slamet Riyadi',
+                rank: 'Chief Cook',
+                category: 'Rating',
+                department: 'Galley',
+                vesselType: 'Cargo',
+                docNumber: 'SB-58291044 / Ship Cook Cert',
+                interviewer: 'Rina Kusuma (Sr. Crewing Officer)',
+                date: '2026-11-24',
+                scores: { safety: 4.0, stress: 4.5, teamwork: 4.5, integrity: 4.5, leadership: 3.5 },
+                avgScore: 4.20,
+                status: 'Recommended',
+                notes: 'Sangat memahami standar higienitas MLC 2006, pengelolaan stok bahan makanan untuk pelayaran jauh, serta mampu menjaga moral kru lewat variasi menu Nusantara & Western.'
+            }
+        ];
+
+        let selectedCandidateId = candidates[0].id;
+        let radarChartInstance = null;
+        let doughnutChartInstance = null;
+
+        // ==========================================
+        // 2. INITIALIZATION ON WINDOW LOAD
+        // ==========================================
+        window.onload = function () {
+            initCharts();
+            updateKPIs();
+            renderTable();
+            selectCandidateForRadar(selectedCandidateId);
+            handleSliderChange();
+        };
+
+        // ==========================================
+        // 3. CHARTS INITIALIZATION & UPDATES
+        // ==========================================
+        function initCharts() {
+            // 3A. Radar Chart (5 Character Dimensions vs PT SOSM Benchmark)
+            const radarCtx = document.getElementById('characterRadarChart').getContext('2d');
+            radarChartInstance = new Chart(radarCtx, {
+                type: 'radar',
+                data: {
+                    labels: [
+                        'Safety Mindset',
+                        'Ketahanan Stres',
+                        'Kerja Sama Tim',
+                        'Integritas & Disiplin',
+                        'Kepemimpinan'
+                    ],
+                    datasets: [
+                        {
+                            label: 'Kandidat Terpilih',
+                            data: [4.5, 4.5, 4.0, 5.0, 4.5],
+                            fill: true,
+                            backgroundColor: 'rgba(13, 148, 136, 0.22)',
+                            borderColor: '#0d9488',
+                            pointBackgroundColor: '#0f294a',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: '#0d9488',
+                            borderWidth: 2.5
+                        },
+                        {
+                            label: 'Standar PT SOSM',
+                            data: BENCHMARK_SCORES,
+                            fill: true,
+                            backgroundColor: 'rgba(15, 41, 74, 0.06)',
+                            borderColor: '#94a3b8',
+                            borderDash: [5, 5],
+                            pointBackgroundColor: '#64748b',
+                            pointBorderColor: '#fff',
+                            borderWidth: 1.5
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: 5,
+                            ticks: {
+                                stepSize: 1,
+                                font: { size: 10, family: 'Inter' },
+                                color: '#64748b',
+                                backdropColor: 'transparent'
+                            },
+                            pointLabels: {
+                                font: { size: 11, weight: '600', family: 'Inter' },
+                                color: '#1e293b'
+                            },
+                            grid: { color: '#e2e8f0' },
+                            angleLines: { color: '#e2e8f0' }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 12,
+                                font: { size: 11, family: 'Inter', weight: '600' },
+                                color: '#334155'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 3B. Doughnut Chart (Recommendation Distribution)
+            const doughnutCtx = document.getElementById('distributionDoughnutChart').getContext('2d');
+            doughnutChartInstance = new Chart(doughnutCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Recommended', 'Conditional / Review', 'Not Recommended'],
+                    datasets: [{
+                        data: [0, 0, 0],
+                        backgroundColor: ['#10b981', '#f59e0b', '#f43f5e'],
+                        borderColor: '#ffffff',
+                        borderWidth: 2,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '66%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const val = context.raw || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const pct = total > 0 ? Math.round((val / total) * 100) : 0;
+                                    return ` ${context.label}: ${val} kandidat (${pct}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            updateDistributionChart();
+        }
+
+        function selectCandidateForRadar(id) {
+            const candidate = candidates.find(c => c.id === id);
+            if (!candidate) return;
+
+            selectedCandidateId = id;
+
+            // Update Radar Card Header
+            document.getElementById('radarCandidateName').textContent = candidate.name;
+            document.getElementById('radarCandidateMeta').textContent = `${candidate.rank} (${candidate.category}) • ${candidate.vesselType}`;
+            document.getElementById('radarAvgText').textContent = `${candidate.avgScore.toFixed(2)} / 5.00`;
+            document.getElementById('radarNotePreview').textContent = `"${candidate.notes || 'Tidak ada catatan khusus.'}"`;
+
+            // Update Badge
+            const badgeEl = document.getElementById('radarBadge');
+            badgeEl.textContent = candidate.status;
+            badgeEl.className = `px-2.5 py-1 text-xs font-bold rounded-full border shrink-0 ${getStatusBadgeClasses(candidate.status)}`;
+
+            // Update Radar Dataset
+            radarChartInstance.data.datasets[0].label = candidate.name;
+            radarChartInstance.data.datasets[0].data = [
+                candidate.scores.safety,
+                candidate.scores.stress,
+                candidate.scores.teamwork,
+                candidate.scores.integrity,
+                candidate.scores.leadership
+            ];
+            radarChartInstance.update();
+
+            // Highlight selected row in table
+            renderTable();
+        }
+
+        function previewLiveOnRadar() {
+            const nameInput = document.getElementById('candName').value.trim() || 'Simulasi Kandidat Baru';
+            const rankInput = document.getElementById('candRank').value;
+            const vesselInput = document.getElementById('candVessel').value;
+            const scores = getCurrentFormScores();
+            const avg = calculateAverage(scores);
+            const decision = determineDecision(avg, scores.safety, document.getElementById('candDecision').value);
+
+            document.getElementById('radarCandidateName').textContent = `${nameInput} (Simulasi)`;
+            document.getElementById('radarCandidateMeta').textContent = `${rankInput} • ${vesselInput}`;
+            document.getElementById('radarAvgText').textContent = `${avg.toFixed(2)} / 5.00`;
+            document.getElementById('radarNotePreview').textContent = document.getElementById('candNotes').value.trim() 
+                ? `"${document.getElementById('candNotes').value.trim()}"` 
+                : '"Pratinjau skor dari form input interview."';
+
+            const badgeEl = document.getElementById('radarBadge');
+            badgeEl.textContent = decision;
+            badgeEl.className = `px-2.5 py-1 text-xs font-bold rounded-full border shrink-0 ${getStatusBadgeClasses(decision)}`;
+
+            radarChartInstance.data.datasets[0].label = `${nameInput} (Simulasi)`;
+            radarChartInstance.data.datasets[0].data = [
+                scores.safety,
+                scores.stress,
+                scores.teamwork,
+                scores.integrity,
+                scores.leadership
+            ];
+            radarChartInstance.update();
+
+            showToast('Grafik Radar Diperbarui', 'Menampilkan simulasi profil karakter kandidat dari form.', 'info');
+        }
+
+        function updateDistributionChart() {
+            const rankFilter = document.getElementById('chartRankFilter').value;
+            const vesselFilter = document.getElementById('chartVesselFilter').value;
+
+            const filtered = candidates.filter(c => {
+                const matchRank = rankFilter === 'ALL' || c.category === rankFilter;
+                const matchVessel = vesselFilter === 'ALL' || c.vesselType === vesselFilter;
+                return matchRank && matchVessel;
+            });
+
+            const recCount = filtered.filter(c => c.status === 'Recommended').length;
+            const condCount = filtered.filter(c => c.status === 'Conditional').length;
+            const notCount = filtered.filter(c => c.status === 'Not Recommended').length;
+
+            document.getElementById('distCountRec').textContent = recCount;
+            document.getElementById('distCountCond').textContent = condCount;
+            document.getElementById('distCountNot').textContent = notCount;
+
+            doughnutChartInstance.data.datasets[0].data = [recCount, condCount, notCount];
+            doughnutChartInstance.update();
+        }
+
+        // ==========================================
+        // 4. KPI & FORM HANDLERS
+        // ==========================================
+        function updateKPIs() {
+            const total = candidates.length;
+            const officers = candidates.filter(c => c.category === 'Officer').length;
+            const ratings = candidates.filter(c => c.category === 'Rating').length;
+
+            const sumAvg = candidates.reduce((acc, c) => acc + c.avgScore, 0);
+            const overallAvg = total > 0 ? (sumAvg / total).toFixed(2) : '0.00';
+
+            const recCount = candidates.filter(c => c.status === 'Recommended').length;
+            const recPct = total > 0 ? Math.round((recCount / total) * 100) : 0;
+
+            const reviewCount = candidates.filter(c => c.status === 'Conditional').length;
+            const notRecCount = candidates.filter(c => c.status === 'Not Recommended').length;
+
+            document.getElementById('kpiTotal').textContent = total;
+            document.getElementById('kpiBreakdown').textContent = `${officers} Officer • ${ratings} Rating`;
+            document.getElementById('kpiAvgScore').textContent = overallAvg;
+            document.getElementById('kpiRecommended').textContent = recCount;
+            document.getElementById('kpiRecPct').textContent = `${recPct}%`;
+            document.getElementById('kpiReview').textContent = reviewCount;
+            document.getElementById('kpiRejectedInfo').textContent = `${notRecCount} Not Rec`;
+        }
+
+        function getCurrentFormScores() {
+            return {
+                safety: parseFloat(document.getElementById('scoreSafety').value),
+                stress: parseFloat(document.getElementById('scoreStress').value),
+                teamwork: parseFloat(document.getElementById('scoreTeamwork').value),
+                integrity: parseFloat(document.getElementById('scoreIntegrity').value),
+                leadership: parseFloat(document.getElementById('scoreLeadership').value)
+            };
+        }
+
+        function calculateAverage(scores) {
+            const vals = Object.values(scores);
+            const sum = vals.reduce((a, b) => a + b, 0);
+            return sum / vals.length;
+        }
+
+        function determineDecision(avg, safetyScore, manualOverride) {
+            if (manualOverride && manualOverride !== 'AUTO') {
+                return manualOverride;
+            }
+            // Maritime Safety Rule: Safety Mindset below 3.0 cannot be directly Recommended
+            if (safetyScore < 3.0 || avg < 3.0) {
+                return 'Not Recommended';
+            }
+            if (avg >= 3.8 && safetyScore >= 3.5) {
+                return 'Recommended';
+            }
+            return 'Conditional';
+        }
+
+        function handleSliderChange() {
+            const scores = getCurrentFormScores();
+            document.getElementById('valSafety').textContent = `${scores.safety} / 5`;
+            document.getElementById('valStress').textContent = `${scores.stress} / 5`;
+            document.getElementById('valTeamwork').textContent = `${scores.teamwork} / 5`;
+            document.getElementById('valIntegrity').textContent = `${scores.integrity} / 5`;
+            document.getElementById('valLeadership').textContent = `${scores.leadership} / 5`;
+
+            const avg = calculateAverage(scores);
+            const decision = determineDecision(avg, scores.safety, document.getElementById('candDecision').value);
+
+            document.getElementById('liveAvgBadge').textContent = avg.toFixed(2);
+            const pill = document.getElementById('liveStatusPill');
+            pill.textContent = decision;
+            pill.className = `text-[11px] font-bold px-2 py-0.5 rounded-full ${getStatusBadgeClasses(decision)}`;
+        }
+
+        document.getElementById('candDecision').addEventListener('change', handleSliderChange);
+
+        function togglePrompt(promptId) {
+            const el = document.getElementById(promptId);
+            el.classList.toggle('hidden');
+        }
+
+        function resetForm() {
+            document.getElementById('interviewForm').reset();
+            document.getElementById('scoreSafety').value = 4;
+            document.getElementById('scoreStress').value = 4;
+            document.getElementById('scoreTeamwork').value = 4;
+            document.getElementById('scoreIntegrity').value = 4.5;
+            document.getElementById('scoreLeadership').value = 3.5;
+            handleSliderChange();
+        }
+
+        // Form Submission Handler
+        document.getElementById('interviewForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const name = document.getElementById('candName').value.trim();
+            const rank = document.getElementById('candRank').value;
+            const vesselType = document.getElementById('candVessel').value;
+            const docNumber = document.getElementById('candDoc').value.trim();
+            const interviewer = document.getElementById('candInterviewer').value.trim();
+            const notes = document.getElementById('candNotes').value.trim() || 'Evaluasi standar wawancara crewing PT SOSM.';
+            const manualOverride = document.getElementById('candDecision').value;
+
+            const scores = getCurrentFormScores();
+            const avgScore = parseFloat(calculateAverage(scores).toFixed(2));
+            const status = determineDecision(avgScore, scores.safety, manualOverride);
+            const meta = getRankMetadata(rank);
+
+            const today = new Date().toISOString().split('T')[0];
+            const newId = `SOSM-2026-${String(candidates.length + 1).padStart(3, '0')}`;
+
+            const newCandidate = {
+                id: newId,
+                name,
+                rank,
+                category: meta.category,
+                department: meta.department,
+                vesselType,
+                docNumber,
+                interviewer,
+                date: today,
+                scores,
+                avgScore,
+                status,
+                notes
+            };
+
+            // Add to top of list
+            candidates.unshift(newCandidate);
+
+            // Refresh UI components
+            updateKPIs();
+            updateDistributionChart();
+            selectCandidateForRadar(newId);
+            resetForm();
+
+            showToast('Penilaian Berhasil Disimpan', `${name} (${rank}) ditambahkan dengan status ${status}.`);
+        });
+
+        // ==========================================
+        // 5. TABLE RENDERING & FILTERING
+        // ==========================================
+        function getStatusBadgeClasses(status) {
+            if (status === 'Recommended') {
+                return 'bg-emerald-100 text-emerald-800 border-emerald-200';
+            } else if (status === 'Conditional') {
+                return 'bg-amber-100 text-amber-800 border-amber-200';
+            } else {
+                return 'bg-rose-100 text-rose-800 border-rose-200';
+            }
+        }
+
+        function renderTable() {
+            const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+            const deptFilter = document.getElementById('filterDept').value;
+            const statusFilter = document.getElementById('filterStatus').value;
+
+            const filtered = candidates.filter(c => {
+                const matchesSearch = c.name.toLowerCase().includes(searchQuery) ||
+                                      c.rank.toLowerCase().includes(searchQuery) ||
+                                      c.docNumber.toLowerCase().includes(searchQuery) ||
+                                      c.vesselType.toLowerCase().includes(searchQuery);
+                const matchesDept = deptFilter === 'ALL' || c.department === deptFilter;
+                const matchesStatus = statusFilter === 'ALL' || c.status === statusFilter;
+                return matchesSearch && matchesDept && matchesStatus;
+            });
+
+            const tbody = document.getElementById('candidateTableBody');
+            const emptyState = document.getElementById('emptyTableState');
+            tbody.innerHTML = '';
+
+            if (filtered.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            filtered.forEach(c => {
+                const isSelected = c.id === selectedCandidateId;
+                const tr = document.createElement('tr');
+                tr.className = `cursor-pointer transition ${isSelected ? 'bg-teal-50/70 hover:bg-teal-50' : 'hover:bg-slate-50'}`;
+                tr.onclick = () => selectCandidateForRadar(c.id);
+
+                // Mini score pills
+                const s = c.scores;
+                const scoreSummary = `
+                    <div class="inline-flex items-center space-x-1 text-[11px] font-mono bg-slate-100 px-2 py-1 rounded border border-slate-200 text-slate-700" title="Safety | Stres | Tim | Integritas | Leadership">
+                        <span class="${s.safety < 3 ? 'text-rose-600 font-bold' : ''}">${s.safety}</span>/<span>${s.stress}</span>/<span>${s.teamwork}</span>/<span>${s.integrity}</span>/<span>${s.leadership}</span>
+                    </div>
+                `;
+
+                tr.innerHTML = `
+                    <td class="py-3.5 px-4">
+                        <div class="flex items-center space-x-2.5">
+                            <div class="w-8 h-8 rounded-full ${isSelected ? 'bg-teal-600 text-white' : 'bg-navy-900 text-white'} flex items-center justify-center text-xs font-bold shrink-0">
+                                ${c.name.replace('Capt. ', '').charAt(0)}
+                            </div>
+                            <div>
+                                <p class="font-bold text-navy-900 text-xs sm:text-sm">${c.name}</p>
+                                <p class="text-[11px] text-slate-500">${c.docNumber}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="py-3.5 px-4">
+                        <p class="font-semibold text-slate-800 text-xs sm:text-sm">${c.rank}</p>
+                        <span class="text-[11px] text-slate-500">${c.department} • ${c.category}</span>
+                    </td>
+                    <td class="py-3.5 px-4">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
+                            ${c.vesselType}
+                        </span>
+                    </td>
+                    <td class="py-3.5 px-4 text-center">
+                        ${scoreSummary}
+                    </td>
+                    <td class="py-3.5 px-4 text-center">
+                        <span class="text-sm font-extrabold ${c.avgScore >= 3.8 ? 'text-teal-700' : c.avgScore >= 3.0 ? 'text-amber-600' : 'text-rose-600'}">
+                            ${c.avgScore.toFixed(2)}
+                        </span>
+                    </td>
+                    <td class="py-3.5 px-4">
+                        <span class="inline-block px-2.5 py-1 text-xs font-bold rounded-full border ${getStatusBadgeClasses(c.status)}">
+                            ${c.status}
+                        </span>
+                    </td>
+                    <td class="py-3.5 px-4 text-right">
+                        <button type="button" onclick="event.stopPropagation(); openCandidateModal('${c.id}')" 
+                            class="px-3 py-1.5 bg-white hover:bg-navy-900 text-navy-900 hover:text-white border border-slate-300 hover:border-navy-900 rounded-lg text-xs font-semibold transition shadow-xs">
+                            Detail
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ==========================================
+        // 6. DETAIL MODAL & PRINTABLE CARD LOGIC
+        // ==========================================
+        let activeModalCandidateId = null;
+
+        function openCurrentSelectedModal() {
+            if (selectedCandidateId) {
+                openCandidateModal(selectedCandidateId);
+            }
+        }
+
+        function openCandidateModal(id) {
+            const c = candidates.find(item => item.id === id);
+            if (!c) return;
+
+            activeModalCandidateId = id;
+            selectCandidateForRadar(id);
+
+            document.getElementById('modalName').textContent = c.name;
+            document.getElementById('modalCategoryTag').textContent = `${c.department} • ${c.category}`;
+            document.getElementById('modalRankVessel').textContent = `${c.rank} — Penempatan: ${c.vesselType}`;
+            document.getElementById('modalDoc').textContent = c.docNumber;
+            document.getElementById('modalDate').textContent = c.date;
+            document.getElementById('modalScore').textContent = c.avgScore.toFixed(2);
+            document.getElementById('modalNotes').textContent = c.notes;
+            document.getElementById('modalInterviewer').textContent = c.interviewer;
+
+            const badge = document.getElementById('modalBadge');
+            badge.textContent = c.status;
+            badge.className = `inline-block px-2.5 py-0.5 text-xs font-bold rounded-full border ${getStatusBadgeClasses(c.status)}`;
+
+            // Build 5 Dimension Bars
+            const dimensions = [
+                { label: 'Safety Mindset & Kepatuhan SOP', val: c.scores.safety, bench: BENCHMARK_SCORES[0] },
+                { label: 'Ketahanan Stres & Emosi', val: c.scores.stress, bench: BENCHMARK_SCORES[1] },
+                { label: 'Kerja Sama Tim & Komunikasi', val: c.scores.teamwork, bench: BENCHMARK_SCORES[2] },
+                { label: 'Integritas & Disiplin', val: c.scores.integrity, bench: BENCHMARK_SCORES[3] },
+                { label: 'Kepemimpinan & Inisiatif', val: c.scores.leadership, bench: BENCHMARK_SCORES[4] }
+            ];
+
+            const dimContainer = document.getElementById('modalDimensionsList');
+            dimContainer.innerHTML = dimensions.map(d => {
+                const pct = (d.val / 5) * 100;
+                const barColor = d.val >= d.bench ? 'bg-teal-600' : d.val >= 3.0 ? 'bg-amber-500' : 'bg-rose-500';
+                return `
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="font-semibold text-slate-700">${d.label}</span>
+                            <span class="font-bold text-navy-900">${d.val.toFixed(1)} <span class="text-slate-400 font-normal">(Std: ${d.bench})</span></span>
+                        </div>
+                        <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                            <div class="${barColor} h-2 rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Auto-generate Strengths & Red Flags based on dimension scores
+            const strengths = dimensions.filter(d => d.val >= 4.0).map(d => d.label);
+            const weaknesses = dimensions.filter(d => d.val < d.bench).map(d => `${d.label} (${d.val.toFixed(1)})`);
+
+            document.getElementById('modalStrengths').textContent = strengths.length > 0 
+                ? `Unggul pada aspek: ${strengths.join(', ')}.` 
+                : 'Memenuhi standar dasar operasional pelaut.';
+
+            document.getElementById('modalRedFlags').textContent = weaknesses.length > 0 
+                ? `Skor di bawah benchmark PT SOSM pada: ${weaknesses.join(', ')}. Disarankan pembekalan khusus sebelum sign-on.` 
+                : 'Tidak ditemukan red flags signifikan; seluruh dimensi memenuhi standar minimum perusahaan.';
+
+            document.getElementById('candidateModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('candidateModal').classList.add('hidden');
+        }
+
+        function deleteCandidateFromModal() {
+            if (!activeModalCandidateId) return;
+            if (candidates.length <= 1) {
+                showToast('Tidak Dapat Menghapus', 'Minimal harus terdapat 1 data kandidat di dalam sistem.', 'warning');
+                return;
+            }
+            candidates = candidates.filter(c => c.id !== activeModalCandidateId);
+            closeModal();
+            updateKPIs();
+            updateDistributionChart();
+            selectCandidateForRadar(candidates[0].id);
+            showToast('Data Dihapus', 'Rekam jejak interview kandidat telah dihapus dari daftar.');
+        }
+
+        // ==========================================
+        // 7. UTILITIES: EXPORT CSV, SCROLL & TOAST
+        // ==========================================
+        function exportToCSV() {
+            const headers = [
+                'ID', 'Tanggal', 'Nama Kandidat', 'Rank', 'Kategori', 'Departemen',
+                'Tipe Kapal', 'No Dokumen', 'Safety', 'Ketahanan Stres', 'Kerja Sama Tim',
+                'Integritas', 'Kepemimpinan', 'Skor Rata-Rata', 'Status Rekomendasi', 'Pewawancara', 'Catatan'
+            ];
+
+            const rows = candidates.map(c => [
+                c.id,
+                c.date,
+                `"${c.name}"`,
+                `"${c.rank}"`,
+                c.category,
+                c.department,
+                `"${c.vesselType}"`,
+                `"${c.docNumber}"`,
+                c.scores.safety,
+                c.scores.stress,
+                c.scores.teamwork,
+                c.scores.integrity,
+                c.scores.leadership,
+                c.avgScore.toFixed(2),
+                c.status,
+                `"${c.interviewer}"`,
+                `"${c.notes.replace(/"/g, '""')}"`
+            ]);
+
+            const csvContent = 'data:text/csv;charset=utf-8,' 
+                + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement('a');
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', `PT_SOSM_Crew_Character_Assessment_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showToast('Ekspor CSV Berhasil', 'File rekap hasil interview crew telah diunduh.');
+        }
+
+        function scrollToForm() {
+            document.getElementById('evaluationFormSection').scrollIntoView({ behavior: 'smooth' });
+            document.getElementById('candName').focus();
+        }
+
+        let toastTimeout;
+        function showToast(title, message, type = 'success') {
+            const toast = document.getElementById('toastNotification');
+            const iconBox = document.getElementById('toastIcon');
+            document.getElementById('toastTitle').textContent = title;
+            document.getElementById('toastMessage').textContent = message;
+
+            if (type === 'warning') {
+                iconBox.className = 'w-8 h-8 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center';
+                iconBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+            } else if (type === 'info') {
+                iconBox.className = 'w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center';
+                iconBox.innerHTML = '<i class="fa-solid fa-chart-pie"></i>';
+            } else {
+                iconBox.className = 'w-8 h-8 rounded-full bg-teal-500/20 text-teal-400 flex items-center justify-center';
+                iconBox.innerHTML = '<i class="fa-solid fa-check"></i>';
+            }
+
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3500);
+        }
+
+        // Close modal when clicking outside card
+        document.getElementById('candidateModal').addEventListener('click', function (e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
